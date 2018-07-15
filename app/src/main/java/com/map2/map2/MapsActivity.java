@@ -8,7 +8,11 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -39,11 +43,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
-        LatLng Taipei = new LatLng(23.7, 121);
+        LatLng Taipei = new LatLng(25.033408, 121.564099);
         LatLng test = new LatLng(23.5,121);
-        mMap.addMarker(new MarkerOptions().position(Taipei).title("Marker in Taiwan"));
+        mMap.addMarker(new MarkerOptions().position(Taipei).title("Marker in Taiwan").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
         mMap.addMarker(new MarkerOptions().position(test).title("test"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(test));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Taipei,14));
 
 
     }
