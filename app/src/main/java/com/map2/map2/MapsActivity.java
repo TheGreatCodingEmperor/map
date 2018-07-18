@@ -42,7 +42,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
 
         LatLng Taipei = new LatLng(25.033408, 121.564099);
-        LatLng test = new LatLng(25.133579,121.226408);
+        LatLng test = new LatLng(25.133579,121.226409);
         mMap.addMarker(new MarkerOptions().position(Taipei).title("Marker in Taiwan").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
         mMap.addMarker(new MarkerOptions().position(test).title("test"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Taipei,14));
