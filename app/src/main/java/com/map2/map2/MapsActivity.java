@@ -9,6 +9,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.location.Criteria;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
@@ -28,20 +29,12 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    private GPSTracker gpsTracker;
-    private Location mLocation;
-    double latitude, longitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        gpsTracker = new GPSTracker(getApplicationContext());
-        mLocation = gpsTracker.getLocation();
-
-        latitude = mLocation.getLatitude();
-        longitude = mLocation.getLongitude();
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -53,10 +46,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(latitude, longitude);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("I'm here...").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney,14));
+
+
+        final Handler h = new Handler();
+        final int delay = 10 * 1000;
+
+        h.postDelayed(new Runnable(){
+            public void run(){
+
+                GPSTracker gpsTracker;
+                Location mLocation;
+                double latitude, longitude;
+
+                gpsTracker = new GPSTracker(getApplicationContext());
+                mLocation = gpsTracker.getLocation();
+                latitude = mLocation.getLatitude();
+                longitude = mLocation.getLongitude();
+                // Add a marker in Sydney and move the camera
+                LatLng sydney = new LatLng(latitude, longitude);
+                mMap.addMarker(new MarkerOptions().position(sydney).title("I'm here...").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney,14));
+
+                h.postDelayed(this, delay);
+            }
+        }, delay);
+
     }
 
 }
