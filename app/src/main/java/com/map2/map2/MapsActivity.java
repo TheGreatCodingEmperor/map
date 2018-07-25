@@ -56,7 +56,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 GPSTracker gpsTracker;
                 Location mLocation;
-                double latitude, longitude;
+                double  latitude, longitude;
 
                 gpsTracker = new GPSTracker(getApplicationContext());
                 mLocation = gpsTracker.getLocation();
