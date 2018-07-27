@@ -48,7 +48,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         Button button = (Button) findViewById(R.id.simpleButton);
-        button.setText("Learn Android @ AbhiAndroid");
+        button.setText("空汙終結者 出發!");
 
 
         final Handler h = new Handler();
