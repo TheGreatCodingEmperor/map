@@ -13,6 +13,8 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.view.View;
+import android.widget.Button;
 
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -45,11 +47,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
+        Button button = (Button) findViewById(R.id.simpleButton);
+        button.setText("Learn Android @ AbhiAndroid");
 
 
         final Handler h = new Handler();
         final int delay = 10 * 1000;
+        button.setOnClickListener(new View.OnClickListener()
+        {
+            public void onClick(View view)
+            {
+                //your write code
+
 
         h.postDelayed(new Runnable(){
             public void run(){
@@ -70,6 +79,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 h.postDelayed(this, delay);
             }
         }, delay);
+            }
+        });
 
     }
 
