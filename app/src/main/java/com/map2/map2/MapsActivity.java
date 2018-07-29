@@ -37,7 +37,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -52,17 +51,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         final Handler h = new Handler();
-        final int delay = 10 * 1000;
+        final int delay = 5 * 1000;
+
+        //Original location add marker
+        GPSTracker OrigpsTracker;
+        Location OrimLocation;
+        double  Orilatitude, Orilongitude;
+
+        OrigpsTracker = new GPSTracker(getApplicationContext());
+        OrimLocation = OrigpsTracker.getLocation();
+        Orilatitude = OrimLocation.getLatitude();
+        Orilongitude = OrimLocation.getLongitude();
+        // Add a marker in Sydney and move the camera
+        LatLng sydney = new LatLng(Orilatitude, Orilongitude);
+        mMap.addMarker(new MarkerOptions().position(sydney).title("I'm here...").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney,14));
+        //Original location add marker
+
+        //click button
         button.setOnClickListener(new View.OnClickListener()
         {
             public void onClick(View view)
             {
-                //your write code
 
-
+        //delay 5 seconds
         h.postDelayed(new Runnable(){
             public void run(){
-
+                //add current location marker
                 GPSTracker gpsTracker;
                 Location mLocation;
                 double  latitude, longitude;
@@ -76,7 +91,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mMap.addMarker(new MarkerOptions().position(sydney).title("I'm here...").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney,14));
 
-                h.postDelayed(this, delay);
+                h.postDelayed(this, delay);//dalay
             }
         }, delay);
             }
