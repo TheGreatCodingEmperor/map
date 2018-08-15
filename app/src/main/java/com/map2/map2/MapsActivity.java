@@ -45,8 +45,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
 
-    @Override
+    void getPosition()
+    {
+        double latitude,longitude;
+        GPSTracker gpsTracker;
+        Location location;
+        gpsTracker = new GPSTracker(getApplicationContext());
+        location = gpsTracker.getLocation();
+        latitude = location.getLatitude();
+        longitude = location.getLongitude();
+        // Add a marker in Sydney and move the camera
+        LatLng original = new LatLng(latitude, longitude);
 
+        mMap.addMarker(new MarkerOptions().position(original).title("WTF").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(original,14));
+    }
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
@@ -66,24 +80,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         final Handler h = new Handler();
-        final int delay = 5 * 1000;
+        final int delay = 3 * 1000;
 
         List<Address> addresses = null;
-        //Original location add marker
-        GPSTracker OrigpsTracker;
-        Location OrimLocation;
-        double  Orilatitude, Orilongitude;
 
-        OrigpsTracker = new GPSTracker(getApplicationContext());
-        OrimLocation = OrigpsTracker.getLocation();
-        Orilatitude = OrimLocation.getLatitude();
-        Orilongitude = OrimLocation.getLongitude();
-        // Add a marker in Sydney and move the camera
-        LatLng original = new LatLng(Orilatitude, Orilongitude);
 
-        mMap.addMarker(new MarkerOptions().position(original).title("WTF").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(original,14));
-        //Original location add marker
+        getPosition();
 
         //click button
         button.setOnClickListener(new View.OnClickListener()
@@ -94,22 +96,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //delay 5 seconds
         h.postDelayed(new Runnable(){
             public void run() {
-                //get coordinate
-                GPSTracker gpsTracker;
-                Location mLocation;
-                double latitude, longitude;
 
-                gpsTracker = new GPSTracker(getApplicationContext());
-                mLocation = gpsTracker.getLocation();
-                latitude = mLocation.getLatitude();
-                longitude = mLocation.getLongitude();
-
-                //get address of current coordinate
-                    // Add a marker in Sydney and move the camera
-                    LatLng current = new LatLng(latitude, longitude);
-                    mMap.addMarker(new MarkerOptions().position(current).title("WTF").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current,14));
-
+                getPosition();
 
                 h.postDelayed(this, delay);//dalay
             }
