@@ -1,5 +1,18 @@
 package com.map2.map2;
 
+import java.io.IOException;
+import java.net.URL;
+import java.util.List;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+import android.app.Activity;
+import android.location.Address;
+import android.location.Geocoder;
+import android.os.Bundle;
+import android.widget.TextView;
 
 import android.Manifest;
 import android.app.Service;
@@ -33,6 +46,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
 
     @Override
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
@@ -50,9 +64,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         button.setText("空汙終結者 出發!");
 
 
+
         final Handler h = new Handler();
         final int delay = 5 * 1000;
 
+        List<Address> addresses = null;
         //Original location add marker
         GPSTracker OrigpsTracker;
         Location OrimLocation;
@@ -63,9 +79,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Orilatitude = OrimLocation.getLatitude();
         Orilongitude = OrimLocation.getLongitude();
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(Orilatitude, Orilongitude);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("I'm here...").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney,14));
+        LatLng original = new LatLng(Orilatitude, Orilongitude);
+
+        mMap.addMarker(new MarkerOptions().position(original).title("WTF").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(original,14));
         //Original location add marker
 
         //click button
@@ -76,20 +93,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //delay 5 seconds
         h.postDelayed(new Runnable(){
-            public void run(){
-                //add current location marker
+            public void run() {
+                //get coordinate
                 GPSTracker gpsTracker;
                 Location mLocation;
-                double  latitude, longitude;
+                double latitude, longitude;
 
                 gpsTracker = new GPSTracker(getApplicationContext());
                 mLocation = gpsTracker.getLocation();
                 latitude = mLocation.getLatitude();
                 longitude = mLocation.getLongitude();
-                // Add a marker in Sydney and move the camera
-                LatLng sydney = new LatLng(latitude, longitude);
-                mMap.addMarker(new MarkerOptions().position(sydney).title("I'm here...").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney,14));
+
+                //get address of current coordinate
+                    // Add a marker in Sydney and move the camera
+                    LatLng current = new LatLng(latitude, longitude);
+                    mMap.addMarker(new MarkerOptions().position(current).title("WTF").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current,14));
+
 
                 h.postDelayed(this, delay);//dalay
             }
