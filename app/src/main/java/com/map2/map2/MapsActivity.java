@@ -44,21 +44,27 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    private double latitude,longitude;
 
     void getPosition()
     {
-        double latitude,longitude;
         GPSTracker gpsTracker;
         Location location;
         gpsTracker = new GPSTracker(getApplicationContext());
         location = gpsTracker.getLocation();
-        latitude = location.getLatitude();
-        longitude = location.getLongitude();
-        // Add a marker in Sydney and move the camera
-        LatLng original = new LatLng(latitude, longitude);
-
-        mMap.addMarker(new MarkerOptions().position(original).title("WTF").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(original,14));
+        if(location!=null)
+        {
+            latitude = location.getLatitude();
+            longitude = location.getLongitude();
+            // Add a marker in location and move the camera
+            LatLng position = new LatLng(latitude, longitude);
+            setMarkerOnMap(position);
+        }
+    }
+    void setMarkerOnMap(LatLng position)
+    {
+        mMap.addMarker(new MarkerOptions().position(position).title("WTF").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position,14));
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,10 +88,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         final Handler h = new Handler();
         final int delay = 3 * 1000;
 
-        List<Address> addresses = null;
-
-
         getPosition();
+
 
         //click button
         button.setOnClickListener(new View.OnClickListener()
