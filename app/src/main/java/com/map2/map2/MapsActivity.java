@@ -9,6 +9,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import android.app.Activity;
+import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
@@ -40,32 +41,40 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
+import android.support.v4.app.ActivityCompat;
+import android.widget.Toast;
+
+import static android.Manifest.permission.*;
+
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private double latitude,longitude;
 
-    void getPosition()
+    void getPosition(Boolean AddMarker)
     {
-        GPSTracker gpsTracker;
-        Location location;
-        gpsTracker = new GPSTracker(getApplicationContext());
-        location = gpsTracker.getLocation();
+        double currentLatitude,currentLongitude;
+        GPSTracker gpsTracker = new GPSTracker(getApplicationContext());
+        Location location = gpsTracker.getLocation();
         if(location!=null)
         {
-            latitude = location.getLatitude();
-            longitude = location.getLongitude();
+            currentLatitude = location.getLatitude();
+            currentLongitude = location.getLongitude();
             // Add a marker in location and move the camera
-            LatLng position = new LatLng(latitude, longitude);
-            setMarkerOnMap(position);
+            latitude = currentLatitude;
+            longitude = currentLongitude;
+            LatLng position = new LatLng(currentLatitude, currentLongitude);
+            setMarkerOnMap(position,AddMarker);
         }
     }
-    void setMarkerOnMap(LatLng position)
+    void setMarkerOnMap(LatLng position,Boolean AddMarker)
     {
-        mMap.addMarker(new MarkerOptions().position(position).title("WTF").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position,14));
+        if(AddMarker)
+            mMap.addMarker(new MarkerOptions().position(position).title("WTF").icon(BitmapDescriptorFactory.defaultMarker(240.0f)));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position,20));
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,7 +97,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         final Handler h = new Handler();
         final int delay = 3 * 1000;
 
-        getPosition();
+        Location location;
+        while(true)
+        {
+            GPSTracker gpsTracker = new GPSTracker(getApplicationContext());
+            location = gpsTracker.getLocation();
+            if(location != null)
+                break;
+        }
+        latitude = location.getLatitude();
+        longitude = location.getLongitude();
+        getPosition(false);
 
 
         //click button
@@ -97,15 +116,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View view)
             {
 
-        //delay 5 seconds
-        h.postDelayed(new Runnable(){
-            public void run() {
+                //delay 5 seconds
+                h.postDelayed(new Runnable(){
+                    public void run() {
 
-                getPosition();
+                         getPosition(true);
 
-                h.postDelayed(this, delay);//dalay
-            }
-        }, delay);
+                         h.postDelayed(this, delay);//dalay
+                    }
+                }, delay);
             }
         });
 
