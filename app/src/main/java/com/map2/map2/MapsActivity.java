@@ -53,13 +53,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private double latitude,longitude;
-    private double polution;
+    private double pollution;
     private double xVector,yVector;
-
-    Location getPosition(Boolean AddMarker)
+    private TextView text;
+    //pre : name is address name,AddMarker is if AddMarker on map or not
+    //post : global latitude and longitude will both update to current location state
+    Location getPosition(String name,Boolean AddMarker)
     {
         double currentLatitude,currentLongitude;
-        float degree;
+        float angle;
         GPSTracker gpsTracker = new GPSTracker(getApplicationContext());
         Location location = gpsTracker.getLocation();
         if(location!=null)
@@ -72,20 +74,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             double yDistance=currentLongitude-longitude;
 
             LatLng position = new LatLng(currentLatitude, currentLongitude);
-            setMarkerOnMap(position,AddMarker);
+            setMarkerOnMap(name,AddMarker);
             if(yDistance==0)
             {
-                if(xDistance>0)degree=0;
-                else degree=180;
+                if(xDistance>0)angle=0;
+                else angle=180;
             }
             else
             {
-                xVector = xVector + polution*xDistance;
-                yVector = yVector + polution*yDistance;
-                degree=(float)Math.toDegrees(Math.atan(xVector/yVector));
+                xVector = xVector + pollution*xDistance;
+                yVector = yVector + pollution*yDistance;
+                angle=(float)Math.toDegrees(Math.atan(xVector/yVector));
             }
 
-            //PointInDirection(degree);
+            //PointInDirection(angle);
 
             latitude = currentLatitude;
             longitude = currentLongitude;
@@ -93,17 +95,43 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         return location;
     }
-    void setMarkerOnMap(LatLng position,Boolean AddMarker)
+    //pre : name is address name , AddMarker is add marker on map or not
+    //post : will add marker on map and move camera to the marker
+    void setMarkerOnMap(String name,Boolean AddMarker)
     {
+        LatLng position =new LatLng(latitude,longitude);
         if(AddMarker)
-            mMap.addMarker(new MarkerOptions().position(position).title("WTF").icon(BitmapDescriptorFactory.defaultMarker(240.0f)));
+            mMap.addMarker(new MarkerOptions().position(position).title(name).icon(BitmapDescriptorFactory.defaultMarker(240.0f)));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position,20));
     }
-    void PointInDirection(float degree)
+    //pre : angle is the angle that arrow point into source of pollution
+    //post : rotate the arrow to point in source of pollution
+    void PointInDirection(float angle)
     {
         ImageView Arrow =  findViewById(R.id.Arrow);
         Arrow.setBackgroundResource(R.color.transparent);
-        Arrow.setRotation((float) degree);
+        Arrow.setRotation((float) angle);
+    }
+    //post : get address in text
+    public void getAddress()
+    {
+        String name = "no address";
+        text =findViewById(R.id.Address);
+        Geocoder geocoder = new Geocoder(this);
+        try {
+            Address address = geocoder.getFromLocation(latitude, longitude, 1).get(0);
+            name = address.getAddressLine(0);
+            String city = address.getLocality();
+            String state = address.getAdminArea();
+            String country = address.getCountryName();
+            String postalCode = address.getPostalCode();
+            String knownName = address.getFeatureName();
+            String allAddress = (String)("City :"+ city  + "\nState: "+ state + "\nCountry: " + country);
+            text.setText(allAddress);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        getPosition(name,true);
     }
 
     @Override
@@ -119,10 +147,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        polution=0;
+        pollution=0;
         mMap = googleMap;
         Button button =  findViewById(R.id.simpleButton);
-        TextView name = findViewById(R.id.Address);
         button.setText("空汙終結者 出發!");
 
 
@@ -140,7 +167,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         latitude = location.getLatitude();
         longitude = location.getLongitude();
-        getPosition(false);
+
+        getPosition("nothing",false);
 
 
         //click button
@@ -148,12 +176,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         {
             public void onClick(View view)
             {
-
                 //delay 5 seconds
                 h.postDelayed(new Runnable(){
                     public void run() {
-
-                        getPosition(true);
+                        getAddress();
 
                         h.postDelayed(this, delay);//dalay
                     }
