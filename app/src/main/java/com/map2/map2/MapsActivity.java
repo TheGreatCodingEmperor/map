@@ -55,6 +55,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private double latitude,longitude;
     private double pollution = 1;
     private double xVector,yVector;
+    private double tmp;
 
     private String[] wind = new String[470];
     private String[] webName = new String[470];
@@ -152,7 +153,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 angle=(float)Math.toDegrees(Math.atan(xVector/yVector));
             }
 
-            //PointInDirection(angle);
+            PointInDirection((float)tmp);
 
             latitude = currentLatitude;
             longitude = currentLongitude;
@@ -194,8 +195,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             {
                 if (strcmp(webName[i],city)){w=wind[i];break;}
             }
-
-            String allAddress = (String)("City :"+ city  + "\nState: "+ state + "\nCountry: " + country + "\n" + w);
+            tmp = positionAngle(w);
+            String allAddress = (String)("City :"+ city  + "\nState: "+ state + "\nCountry: " + country + "\n");
 
             text.setText(allAddress);
 
@@ -212,22 +213,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public double positionAngle(String str)
     {
         double x = 22.5;
-        if (strcmp(str,"北"))return 0;
-        else  if ( strcmp(str,"北北東") )return x;
-        else  if ( strcmp(str,"東北") )return 2*x;
-        else  if ( strcmp(str,"東北東") )return 3*x;
-        else  if ( strcmp(str,"東") )return 4*x;
-        else  if ( strcmp(str,"東南東") )return 5*x;
-        else  if ( strcmp(str,"東南") )return 6*x;
-        else  if ( strcmp(str,"南南東") )return 7*x;
-        else  if ( strcmp(str,"南") )return 8*x;
-        else  if ( strcmp(str,"南南西") )return 9*x;
-        else  if ( strcmp(str,"西南") )return 10*x;
-        else  if ( strcmp(str,"西南西") )return 11*x;
-        else  if ( strcmp(str,"西") )return 12*x;
-        else  if ( strcmp(str,"西北西") )return 13*x;
-        else  if ( strcmp(str,"西北") )return 14*x;
-        else  if ( strcmp(str,"北北西") )return 15*x;
+        if (str.equals("北"))return 0;
+        else if ( str.equals("北北東") )return x;
+        else  if ( str.equals("東北") )return 2*x;
+        else  if ( str.equals("東北東") )return 3*x;
+        else  if ( str.equals("東") )return 4*x;
+        else  if ( str.equals("東南東") )return 5*x;
+        else  if ( str.equals("東南") )return 6*x;
+        else  if ( str.equals("南南東") )return 7*x;
+        else  if ( str.equals("南") )return 8*x;
+        else  if ( str.equals("南南西") )return 9*x;
+        else  if ( str.equals("西南") )return 10*x;
+        else  if ( str.equals("西南西") )return 11*x;
+        else  if ( str.equals("西") )return 12*x;
+        else  if ( str.equals("西北西") )return 13*x;
+        else  if ( str.equals("西北") )return 14*x;
+        else  if ( str.equals("北北西") )return 15*x;
         else return -1;
     }
 }
