@@ -181,9 +181,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void getAddress()
     {
         String name = "no address";
-        String w = "nothing";
         Geocoder geocoder = new Geocoder(this);
         try {
+            String w = "nothing";
             Address address = geocoder.getFromLocation(latitude, longitude, 1).get(0);
             name = address.getAddressLine(0);
             String city = address.getLocality();
@@ -191,12 +191,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             String country = address.getCountryName();
             String postalCode = address.getPostalCode();
             String knownName = address.getFeatureName();
+            int b = city.length();
             for(int i=0;i<469;i++)
             {
-                if (strcmp(webName[i],city)){w=wind[i];break;}
+                int a = webName[i].length();
+                if(a<b)
+                {
+                    if (strcmp(webName[i],city)){w=wind[i];break;}
+                }
             }
             tmp = positionAngle(w);
-            String allAddress = (String)("City :"+ city  + "\nState: "+ state + "\nCountry: " + country + "\n");
+            String allAddress = (String)("City :"+ city  + "\nState: "+ state + "\nCountry: " + country + "\n"+ w);
 
             text.setText(allAddress);
 

@@ -27,7 +27,7 @@ public class Wind {
                             .header("Accept-Encoding", "gzip, deflate")
                             .userAgent("Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0")
                             .maxBodySize(0)
-                            .timeout(600000)
+                            .timeout(0)
                             .get();
                     String title = doc.title();
                     Elements Img = doc.select("td[class*=TypeWD]");
