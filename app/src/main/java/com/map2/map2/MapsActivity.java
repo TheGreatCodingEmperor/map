@@ -57,8 +57,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private double xVector,yVector;
     private double tmp;
 
-    private String[] wind = new String[470];
-    private String[] webName = new String[470];
+    private String[] wind = new String[471];
+    private String[] webName = new String[471];
 
     private TextView text;
     boolean stop = true;
@@ -199,7 +199,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             String postalCode = address.getPostalCode();
             String knownName = address.getFeatureName();
             int b = city.length();
-            for(int i=0;i<469;i++)
+            for(int i=0;i<=469;i++)
             {
                 int a = webName[i].length();
                 if(a<b)

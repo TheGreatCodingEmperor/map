@@ -13,8 +13,8 @@ import java.net.URL;
 public class Wind {
     private Document doc;
     private Elements Img,texts;
-    private String[] wind = new String[470];
-    private String[] name = new String[470];
+    private String[] wind = new String[471];
+    private String[] name = new String[471];
     public Wind(){}
 
     public void getWebsite() {
