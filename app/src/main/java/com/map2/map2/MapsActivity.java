@@ -61,6 +61,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String[] webName = new String[470];
 
     private TextView text;
+    boolean stop = true;
 
 
     @Override
@@ -78,13 +79,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         pollution = 0;
         mMap = googleMap;
-        Button button =  findViewById(R.id.simpleButton);
-        button.setText("空汙終結者 出發!");
 
+        final Button button =  findViewById(R.id.simpleButton);
+        button.setText("空汙終結者 出發!");
         text =findViewById(R.id.Address);
 
         final Handler h = new Handler();
-        final int delay = 3 * 1000;
+        final int delay = 1 * 1000;
 
         Location location;
 
@@ -112,12 +113,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         {
             public void onClick(View view)
             {
+                stop = !stop;
                 //delay 5 seconds
                 h.postDelayed(new Runnable(){
                     public void run() {
                         getAddress();
-
-                        h.postDelayed(this, delay);//dalay
+                        if(!stop)
+                        {
+                            button.setText("聽我諭令，凍結時空!");
+                            h.postDelayed(this, delay);//dalay
+                        }
+                        else
+                            button.setText("空汙終結者 出發!");
                     }
                 }, delay);
             }
