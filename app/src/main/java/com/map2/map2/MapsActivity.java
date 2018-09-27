@@ -57,8 +57,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private double xVector,yVector;
     private double tmp;
 
-    private String[] wind = new String[471];
-    private String[] webName = new String[471];
+    private String[] wind = new String[480];
+    private String[] webName = new String[480];
 
     private TextView text;
     boolean stop = true;
