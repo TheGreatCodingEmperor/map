@@ -1,0 +1,56 @@
+package com.map2.map2;
+
+import android.os.AsyncTask;
+
+import com.google.gson.Gson;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+public class fetchData extends AsyncTask<Void, Void, Void> {
+
+    String[] pm = new String[20];
+    @Override
+    protected Void doInBackground(Void... voids) {
+        try {
+            URL url = new URL("https://thingspeak.com/channels/618365/field/3.json");
+
+            HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+            InputStream inputStream = httpURLConnection.getInputStream();
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+
+            Gson gson = new Gson();
+            Result result =  gson.fromJson(bufferedReader,Result.class);
+            int i=0;
+            if(result != null){
+                for( Feed c : result.getFeeds() ){
+                    pm[i] = c.getField3();
+                    i++;
+                }
+            }
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    protected void onPostExecute(Void aVoid) {
+        super.onPostExecute(aVoid);
+    }
+    public String getPM(){
+        return pm[0];
+    }
+}

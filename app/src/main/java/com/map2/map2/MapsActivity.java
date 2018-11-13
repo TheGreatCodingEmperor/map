@@ -1,37 +1,21 @@
 package com.map2.map2;
 
 import java.io.IOException;
-import java.net.URL;
-import java.util.List;
+import java.util.concurrent.ExecutionException;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-import android.app.Activity;
-import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import android.Manifest;
-import android.app.Service;
-import android.content.Context;
-import android.content.Intent;
+
 import android.location.Location;
-import android.location.LocationManager;
-import android.location.Criteria;
-import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.content.ContextCompat;
-import android.view.View;
 import android.widget.Button;
 
-import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -40,22 +24,17 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import static android.content.pm.PackageManager.PERMISSION_GRANTED;
-
-import android.support.v4.app.ActivityCompat;
-import android.widget.Toast;
-
-import static android.Manifest.permission.*;
-import static com.map2.map2.R.color.trans;
 
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private double latitude,longitude;
-    private double pollution = 1;
+    private float pollution = 1;
     private double xVector,yVector;
     private double tmp;
+
+    public String PM;
 
     private String[] wind = new String[480];
     private String[] webName = new String[480];
@@ -118,10 +97,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 h.postDelayed(new Runnable(){
                     public void run() {
                         getAddress();
+                        fetchData process = new fetchData();
+                        try {
+                            process.execute().get();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        } catch (ExecutionException e) {
+                            e.printStackTrace();
+                        }
+                        PM = process.getPM();
                         if(!stop)
                         {
                             button.setText("聽我諭令，凍結時空!");
                             h.postDelayed(this, delay);//dalay
+                            PM = process.getPM();
                         }
                         else
                             button.setText("空汙終結者 出發!");
@@ -150,17 +139,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             setMarkerOnMap(address,whetherAddMarker);
             if(yDistance==0)
             {
+                if(xDistance==0)angle = (float)tmp;
                 if(xDistance>0)angle=0;
                 else angle=180;
             }
             else
             {
-                xVector = xVector + pollution*xDistance;
-                yVector = yVector + pollution*yDistance;
+                xVector = 0.9*xVector + pollution*xDistance;
+                yVector = 0.9*yVector + pollution*yDistance;
                 angle=(float)Math.toDegrees(Math.atan(xVector/yVector));
             }
 
-            PointInDirection((float)tmp);
+            PointInDirection((float)angle);
 
             latitude = currentLatitude;
             longitude = currentLongitude;
@@ -173,7 +163,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     {
         LatLng position =new LatLng(latitude,longitude);
         if(AddMarker)
-            mMap.addMarker(new MarkerOptions().position(position).title(name).icon(BitmapDescriptorFactory.defaultMarker(240.0f)));
+            mMap.addMarker(new MarkerOptions().position(position).title(name).icon(BitmapDescriptorFactory.defaultMarker(260)));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position,20));
     }
     //pre : angle is the angle that arrow point into source of pollution
@@ -208,7 +198,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             }
             tmp = positionAngle(w);
-            String allAddress = (String)("City :"+ city  + "\nState: "+ state + "\nCountry: " + country + "\n"+ w);
+            String allAddress = (String)("City :"+ city  + "\nState: "+ state + "\nCountry: " + country + "\n"+ w + "\n" + PM);
 
             text.setText(allAddress);
 
