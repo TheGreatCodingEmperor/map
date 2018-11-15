@@ -168,7 +168,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     void setMarkerOnMap(String name, Boolean AddMarker) {
         LatLng position = new LatLng(latitude, longitude);
         if (AddMarker)
-            mMap.addMarker(new MarkerOptions().position(position).title(name).icon(BitmapDescriptorFactory.defaultMarker(260)));
+            mMap.addMarker(new MarkerOptions().position(position).title(name).icon(BitmapDescriptorFactory.defaultMarker(getColor(newPollution))));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 20));
     }
 
@@ -245,5 +245,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         else if (str.equals("西北")) return 14 * x;
         else if (str.equals("北北西")) return 15 * x;
         else return -1;
+    }
+    public float getColor(float color)
+    {
+        if (color <= 15.4) return (float)120.0;
+        else if(color <= 35.4) return (float)60.0;
+        else if(color <= 54.4) return (float)30.0;
+        else if(color <= 150.4) return (float)0.0;
+        else return (float)270.0;
     }
 }
