@@ -1,33 +1,43 @@
-package com.map2.map2;
 
-import java.util.List;
+package com.map2.map2;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class Result {
 
-    @SerializedName("channel")
+    @SerializedName("created_at")
     @Expose
-    private Channel channel;
-    @SerializedName("feeds")
+    private String createdAt;
+    @SerializedName("entry_id")
     @Expose
-    private List<Feed> feeds = null;
+    private Integer entryId;
+    @SerializedName("field1")
+    @Expose
+    private String field1;
 
-    public Channel getChannel() {
-        return channel;
+    public String getCreatedAt() {
+        return createdAt;
     }
 
-    public void setChannel(Channel channel) {
-        this.channel = channel;
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public List<Feed> getFeeds() {
-        return feeds;
+    public Integer getEntryId() {
+        return entryId;
     }
 
-    public void setFeeds(List<Feed> feeds) {
-        this.feeds = feeds;
+    public void setEntryId(Integer entryId) {
+        this.entryId = entryId;
+    }
+
+    public String getField1() {
+        return field1;
+    }
+
+    public void setField1(String field1) {
+        this.field1 = field1;
     }
 
 }

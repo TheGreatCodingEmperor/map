@@ -25,19 +25,28 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 
-
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
+    // APP
     private GoogleMap mMap;
-    private double latitude,longitude;
-    private float pollution = 1;
-    private double xVector,yVector;
+    private double latitude, longitude;
+
+    private float pollution = 0;
+    private float newPollution = 0;
+
+    private double xVector, yVector;
     private double tmp;
+    //
 
+    //PM2.5
     public String PM;
+    public String Time;
+    //
 
+    // Wind Data
     private String[] wind = new String[480];
     private String[] webName = new String[480];
+    //
 
     private TextView text;
     boolean stop = true;
@@ -59,9 +68,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         pollution = 0;
         mMap = googleMap;
 
-        final Button button =  findViewById(R.id.simpleButton);
+        final Button button = findViewById(R.id.simpleButton);
         button.setText("空汙終結者 出發!");
-        text =findViewById(R.id.Address);
+        text = findViewById(R.id.Address);
 
         final Handler h = new Handler();
         final int delay = 1 * 1000;
@@ -73,30 +82,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         wind = data.getImg();
         webName = data.getTexts();
 
-        while(true)
-        {
+        while (true) {
             GPSTracker gpsTracker = new GPSTracker(getApplicationContext());
             location = gpsTracker.getLocation();
-            if(location != null)
+            if (location != null)
                 break;
         }
 
         latitude = location.getLatitude();
         longitude = location.getLongitude();
 
-        getPosition("nothing",false);
+        getPosition("nothing", false);
 
 
         //click button
-        button.setOnClickListener(new View.OnClickListener()
-        {
-            public void onClick(View view)
-            {
+        button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
                 stop = !stop;
                 //delay 5 seconds
-                h.postDelayed(new Runnable(){
+                h.postDelayed(new Runnable() {
                     public void run() {
-                        getAddress();
                         fetchData process = new fetchData();
                         try {
                             process.execute().get();
@@ -106,13 +111,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             e.printStackTrace();
                         }
                         PM = process.getPM();
-                        if(!stop)
-                        {
+                        Time = process.getTime();
+                        newPollution = Float.parseFloat(PM);
+                        getAddress();
+                        if (!stop) {
                             button.setText("聽我諭令，凍結時空!");
                             h.postDelayed(this, delay);//dalay
-                            PM = process.getPM();
-                        }
-                        else
+                        } else
                             button.setText("空汙終結者 出發!");
                     }
                 }, delay);
@@ -120,63 +125,63 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
     }
+
     //pre : name is address name,AddMarker is if AddMarker on map or not
     //post : global latitude and longitude will both update to current location state
-    Location getPosition(String address,Boolean whetherAddMarker)
-    {
-        double currentLatitude,currentLongitude;
+    Location getPosition(String address, Boolean whetherAddMarker) {
+        double currentLatitude, currentLongitude;
         float angle;
         GPSTracker gpsTracker = new GPSTracker(getApplicationContext());
         Location location = gpsTracker.getLocation();
-        if(location!=null)
-        {
+        if (location != null) {
             currentLatitude = location.getLatitude();
             currentLongitude = location.getLongitude();
 
-            double xDistance=(currentLatitude-latitude)*111000;
-            double yDistance=(currentLongitude-longitude)*101000;
+            double xDistance = (currentLatitude - latitude) * 111000;
+            double yDistance = (currentLongitude - longitude) * 101000;
 
-            setMarkerOnMap(address,whetherAddMarker);
-            if(yDistance==0)
-            {
-                if(xDistance==0)angle = (float)tmp;
-                if(xDistance>0)angle=0;
-                else angle=180;
+            setMarkerOnMap(address, whetherAddMarker);
+            if (yDistance != 0) {
+                if (newPollution == pollution) angle = (float) tmp;
+                else {
+                    xVector = 0.9 * xVector + (newPollution - pollution) * xDistance;
+                    yVector = 0.9 * yVector + (newPollution - pollution) * yDistance;
+                    angle = (float) Math.toDegrees(Math.atan(xVector / yVector));
+                }
+            } else {
+                if (xDistance == 0) angle = (float) tmp;
+                else if (xDistance > 0) angle = 0;
+                else angle = 180;
             }
-            else
-            {
-                xVector = 0.9*xVector + pollution*xDistance;
-                yVector = 0.9*yVector + pollution*yDistance;
-                angle=(float)Math.toDegrees(Math.atan(xVector/yVector));
-            }
+            pollution = newPollution;
 
-            PointInDirection((float)angle);
+            PointInDirection((float) angle);
 
             latitude = currentLatitude;
             longitude = currentLongitude;
         }
         return location;
     }
+
     //pre : name is address name , AddMarker is add marker on map or not
     //post : will add marker on map and move camera to the marker
-    void setMarkerOnMap(String name,Boolean AddMarker)
-    {
-        LatLng position =new LatLng(latitude,longitude);
-        if(AddMarker)
+    void setMarkerOnMap(String name, Boolean AddMarker) {
+        LatLng position = new LatLng(latitude, longitude);
+        if (AddMarker)
             mMap.addMarker(new MarkerOptions().position(position).title(name).icon(BitmapDescriptorFactory.defaultMarker(260)));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position,20));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 20));
     }
+
     //pre : angle is the angle that arrow point into source of pollution
     //post : rotate the arrow to point in source of pollution
-    void PointInDirection(float angle)
-    {
-        ImageView Arrow =  findViewById(R.id.Arrow);
+    void PointInDirection(float angle) {
+        ImageView Arrow = findViewById(R.id.Arrow);
         Arrow.setBackgroundResource(R.color.transparent);
-        Arrow.setRotation((float) angle);
+        Arrow.setRotation((float) angle+90);
     }
+
     //post : get address in text
-    public void getAddress()
-    {
+    public void getAddress() {
         String name = "no address";
         Geocoder geocoder = new Geocoder(this);
         try {
@@ -189,48 +194,56 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             String postalCode = address.getPostalCode();
             String knownName = address.getFeatureName();
             int b = city.length();
-            for(int i=0;i<=469;i++)
-            {
+            int i;
+            for (i = 0; i <= 469; i++) {
                 int a = webName[i].length();
-                if(a<b)
-                {
-                    if (strcmp(webName[i],city)){w=wind[i];break;}
+                if (a < b) {
+                    if (strcmp(webName[i], city)) {
+                        w = wind[i];
+                        break;
+                    }
                 }
             }
+            if (i == 470) w = "nothing";
             tmp = positionAngle(w);
-            String allAddress = (String)("City :"+ city  + "\nState: "+ state + "\nCountry: " + country + "\n"+ w + "\n" + PM);
+            String allAddress = (String) ("City :" + city
+                    + "\nState: " + state
+                    + "\nCountry: " + country
+                    + "\n風向: " + w
+                    + "\nPM2.5: " + PM
+                    + "\nTime: " + Time);
 
             text.setText(allAddress);
 
         } catch (IOException e) {
             e.printStackTrace();
         }
-        getPosition(name,true);
+        getPosition(name, true);
     }
-    public Boolean strcmp(String shortS,String longS)
-    {
+
+    public Boolean strcmp(String shortS, String longS) {
         int l = shortS.length();
-        return shortS.substring(0,l-1).equals(longS.substring(0,l-1));
+        return shortS.substring(0, l - 1).equals(longS.substring(0, l - 1));
     }
-    public double positionAngle(String str)
-    {
+
+    public double positionAngle(String str) {
         double x = 22.5;
-        if (str.equals("北"))return 0;
-        else if ( str.equals("北北東") )return x;
-        else  if ( str.equals("東北") )return 2*x;
-        else  if ( str.equals("東北東") )return 3*x;
-        else  if ( str.equals("東") )return 4*x;
-        else  if ( str.equals("東南東") )return 5*x;
-        else  if ( str.equals("東南") )return 6*x;
-        else  if ( str.equals("南南東") )return 7*x;
-        else  if ( str.equals("南") )return 8*x;
-        else  if ( str.equals("南南西") )return 9*x;
-        else  if ( str.equals("西南") )return 10*x;
-        else  if ( str.equals("西南西") )return 11*x;
-        else  if ( str.equals("西") )return 12*x;
-        else  if ( str.equals("西北西") )return 13*x;
-        else  if ( str.equals("西北") )return 14*x;
-        else  if ( str.equals("北北西") )return 15*x;
+        if (str.equals("北")) return 0;
+        else if (str.equals("北北東")) return x;
+        else if (str.equals("東北")) return 2 * x;
+        else if (str.equals("東北東")) return 3 * x;
+        else if (str.equals("東")) return 4 * x;
+        else if (str.equals("東南東")) return 5 * x;
+        else if (str.equals("東南")) return 6 * x;
+        else if (str.equals("南南東")) return 7 * x;
+        else if (str.equals("南")) return 8 * x;
+        else if (str.equals("南南西")) return 9 * x;
+        else if (str.equals("西南")) return 10 * x;
+        else if (str.equals("西南西")) return 11 * x;
+        else if (str.equals("西")) return 12 * x;
+        else if (str.equals("西北西")) return 13 * x;
+        else if (str.equals("西北")) return 14 * x;
+        else if (str.equals("北北西")) return 15 * x;
         else return -1;
     }
 }

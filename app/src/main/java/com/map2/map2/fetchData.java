@@ -18,11 +18,12 @@ import java.net.URL;
 
 public class fetchData extends AsyncTask<Void, Void, Void> {
 
-    String[] pm = new String[20];
+    String pm = null;
+    String time = null;
     @Override
     protected Void doInBackground(Void... voids) {
         try {
-            URL url = new URL("https://thingspeak.com/channels/618365/field/3.json");
+            URL url = new URL("https://thingspeak.com/channels/627077/fields/1/last.json");
 
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
             InputStream inputStream = httpURLConnection.getInputStream();
@@ -30,12 +31,9 @@ public class fetchData extends AsyncTask<Void, Void, Void> {
 
             Gson gson = new Gson();
             Result result =  gson.fromJson(bufferedReader,Result.class);
-            int i=0;
             if(result != null){
-                for( Feed c : result.getFeeds() ){
-                    pm[i] = c.getField3();
-                    i++;
-                }
+                pm = result.getField1();
+                time = result.getCreatedAt();
             }
 
         } catch (MalformedURLException e) {
@@ -49,8 +47,14 @@ public class fetchData extends AsyncTask<Void, Void, Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
+        if(aVoid!=null){
+            getPM();
+        }else{
+            getPM();
+        }
     }
     public String getPM(){
-        return pm[0];
+        return pm;
     }
+    public String getTime(){ return time; }
 }
