@@ -31,7 +31,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private double latitude, longitude;
 
-    private float pollution = 0;
+    private float pollution = -1;
     private float newPollution = 0;
 
     private double xVector, yVector;
@@ -65,7 +65,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        pollution = 0;
         mMap = googleMap;
 
         final Button button = findViewById(R.id.simpleButton);
@@ -73,7 +72,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         text = findViewById(R.id.Address);
 
         final Handler h = new Handler();
-        final int delay = 1 * 1000;
+        final int delay = 2 * 1000;
 
         Location location;
 
@@ -142,16 +141,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             setMarkerOnMap(address, whetherAddMarker);
             if (yDistance != 0) {
-                if (newPollution == pollution) angle = (float) tmp;
+                if (newPollution == pollution || pollution == -1) angle = (float) tmp;
                 else {
                     xVector = 0.9 * xVector + (newPollution - pollution) * xDistance;
                     yVector = 0.9 * yVector + (newPollution - pollution) * yDistance;
                     angle = (float) Math.toDegrees(Math.atan(xVector / yVector));
                 }
-            } else {
-                if (xDistance == 0) angle = (float) tmp;
-                else if (xDistance > 0) angle = 0;
-                else angle = 180;
             }
             pollution = newPollution;
 
@@ -168,7 +163,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     void setMarkerOnMap(String name, Boolean AddMarker) {
         LatLng position = new LatLng(latitude, longitude);
         if (AddMarker)
-            mMap.addMarker(new MarkerOptions().position(position).title(name).icon(BitmapDescriptorFactory.defaultMarker(getColor(newPollution))));
+            mMap.addMarker(new MarkerOptions().position(position).title(name).icon(BitmapDescriptorFactory.defaultMarker((float) 359)));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 20));
     }
 
@@ -177,7 +172,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     void PointInDirection(float angle) {
         ImageView Arrow = findViewById(R.id.Arrow);
         Arrow.setBackgroundResource(R.color.transparent);
-        Arrow.setRotation((float) angle+90);
+        Arrow.setRotation((float) angle + 90);
     }
 
     //post : get address in text
@@ -246,12 +241,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         else if (str.equals("北北西")) return 15 * x;
         else return -1;
     }
-    public float getColor(float color)
-    {
-        if (color <= 15.4) return (float)120.0;
-        else if(color <= 35.4) return (float)60.0;
-        else if(color <= 54.4) return (float)30.0;
-        else if(color <= 150.4) return (float)0.0;
-        else return (float)270.0;
+
+    public float getColor(float color) {
+        if (color <= 50) return (float) 120.0;
+        else if (color <= 100) return (float) (60.0 - (color - 50) * 30 / 50);
+        else if (color <= 150) return (float) (30.0 - (color - 100) * 30 / 50);
+        else if (color <= 200) return (float) (359.0 - (color - 150) * 90 / 50);
+        else return (float) (270.0);
     }
 }
