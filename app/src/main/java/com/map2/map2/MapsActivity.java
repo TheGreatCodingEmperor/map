@@ -33,6 +33,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private float pollution = -1;
     private float newPollution = 0;
+    private float angle = 0;
 
     private double xVector, yVector;
     private double tmp;
@@ -101,19 +102,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //delay 5 seconds
                 h.postDelayed(new Runnable() {
                     public void run() {
-                        fetchData process = new fetchData();
-                        try {
-                            process.execute().get();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        } catch (ExecutionException e) {
-                            e.printStackTrace();
-                        }
-                        PM = process.getPM();
-                        Time = process.getTime();
-                        newPollution = Float.parseFloat(PM);
-                        getAddress();
                         if (!stop) {
+                            fetchData process = new fetchData();
+                            try {
+                                process.execute().get();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            } catch (ExecutionException e) {
+                                e.printStackTrace();
+                            }
+                            PM = process.getPM();
+                            Time = process.getTime();
+                            newPollution = Float.parseFloat(PM);
+                            getAddress();
                             button.setText("聽我諭令，凍結時空!");
                             h.postDelayed(this, delay);//dalay
                         } else
@@ -129,7 +130,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //post : global latitude and longitude will both update to current location state
     Location getPosition(String address, Boolean whetherAddMarker) {
         double currentLatitude, currentLongitude;
-        float angle;
         GPSTracker gpsTracker = new GPSTracker(getApplicationContext());
         Location location = gpsTracker.getLocation();
         if (location != null) {
@@ -140,14 +140,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             double yDistance = (currentLongitude - longitude) * 101000;
 
             setMarkerOnMap(address, whetherAddMarker);
-            if (yDistance != 0) {
-                if (newPollution == pollution || pollution == -1) angle = (float) tmp;
+            if (pollution == -1) angle = (float) tmp;
+            else if (yDistance != 0) {
+                if (newPollution == pollution) angle = (float) tmp;
                 else {
                     xVector = 0.9 * xVector + (newPollution - pollution) * xDistance;
                     yVector = 0.9 * yVector + (newPollution - pollution) * yDistance;
                     angle = (float) Math.toDegrees(Math.atan(xVector / yVector));
                 }
             }
+            else angle = (float)tmp;
             pollution = newPollution;
 
             PointInDirection((float) angle);
@@ -163,7 +165,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     void setMarkerOnMap(String name, Boolean AddMarker) {
         LatLng position = new LatLng(latitude, longitude);
         if (AddMarker)
-            mMap.addMarker(new MarkerOptions().position(position).title(name).icon(BitmapDescriptorFactory.defaultMarker((float) 359)));
+            mMap.addMarker(new MarkerOptions().position(position).title(name).icon(BitmapDescriptorFactory.defaultMarker((float) getColor(newPollution))));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 20));
     }
 
