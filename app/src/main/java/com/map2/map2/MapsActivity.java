@@ -1,6 +1,8 @@
 package com.map2.map2;
 
+import java.util.Calendar;
 import java.io.IOException;
+import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
 import android.location.Address;
@@ -73,7 +75,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         text = findViewById(R.id.Address);
 
         final Handler h = new Handler();
-        final int delay = 2 * 1000;
+        final int delay = 5 * 1000;
 
         Location location;
 
@@ -92,17 +94,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         latitude = location.getLatitude();
         longitude = location.getLongitude();
 
-        getPosition("nothing", false);
+        //getPosition("nothing", false);
+        fetchData process = new fetchData();
+        try {
+            process.execute().get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        PM = process.getPM();
+        newPollution = Float.parseFloat(PM);
+        getAddress();
 
 
         //click button
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 stop = !stop;
-                //delay 5 seconds
-                h.postDelayed(new Runnable() {
-                    public void run() {
-                        if (!stop) {
+                if (!stop) {
+                    button.setText("聽我諭令，凍結時空!");
+                    //delay 5 seconds
+                    h.postDelayed(new Runnable() {
+                        public void run() {
                             fetchData process = new fetchData();
                             try {
                                 process.execute().get();
@@ -112,15 +126,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 e.printStackTrace();
                             }
                             PM = process.getPM();
-                            Time = process.getTime();
                             newPollution = Float.parseFloat(PM);
                             getAddress();
-                            button.setText("聽我諭令，凍結時空!");
                             h.postDelayed(this, delay);//dalay
-                        } else
-                            button.setText("空汙終結者 出發!");
-                    }
-                }, delay);
+                        }
+                    }, delay);
+                } else
+                    button.setText("空汙終結者 出發!");
             }
         });
 
@@ -148,8 +160,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     yVector = 0.9 * yVector + (newPollution - pollution) * yDistance;
                     angle = (float) Math.toDegrees(Math.atan(xVector / yVector));
                 }
-            }
-            else angle = (float)tmp;
+            } else angle = (float) tmp;
             pollution = newPollution;
 
             PointInDirection((float) angle);
@@ -181,10 +192,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void getAddress() {
         String name = "no address";
         Geocoder geocoder = new Geocoder(this);
+        Date currentTime = Calendar.getInstance().getTime();
+        Time = currentTime.toString();
         try {
             String w = "nothing";
             Address address = geocoder.getFromLocation(latitude, longitude, 1).get(0);
-            name = address.getAddressLine(0);
+            name = Time + " PM2.5: " + newPollution;
             String city = address.getLocality();
             String state = address.getAdminArea();
             String country = address.getCountryName();
@@ -245,10 +258,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public float getColor(float color) {
-        if (color <= 50) return (float) 120.0;
-        else if (color <= 100) return (float) (60.0 - (color - 50) * 30 / 50);
-        else if (color <= 150) return (float) (30.0 - (color - 100) * 30 / 50);
-        else if (color <= 200) return (float) (359.0 - (color - 150) * 90 / 50);
-        else return (float) (270.0);
+        if (color <= 11) return (float) 210.0;
+        else if (color <= 23) return (float) 180.0;
+        else if (color <= 35) return (float) 120.0;
+        else if (color <= 41) return (float) 90;
+        else if (color <= 47) return (float) 60;
+        else if (color <= 53) return (float) 30;
+        else if (color <= 58) return (float) 0;
+        else if (color <= 64) return (float) 300;
+        else if (color <= 70) return (float) 270;
+        else return (float) 240;
     }
 }
