@@ -94,8 +94,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         latitude = location.getLatitude();
         longitude = location.getLongitude();
 
-        //getPosition("nothing", false);
-        fetchData process = new fetchData();
+        getPosition("nothing", false);
+        /*fetchData process = new fetchData();
         try {
             process.execute().get();
         } catch (InterruptedException e) {
@@ -105,18 +105,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         PM = process.getPM();
         newPollution = Float.parseFloat(PM);
-        getAddress();
+        getAddress();*/
 
 
         //click button
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 stop = !stop;
-                if (!stop) {
-                    button.setText("聽我諭令，凍結時空!");
-                    //delay 5 seconds
-                    h.postDelayed(new Runnable() {
-                        public void run() {
+                //delay 5 seconds
+                h.postDelayed(new Runnable() {
+                    public void run() {
+                        if (!stop) {
                             fetchData process = new fetchData();
                             try {
                                 process.execute().get();
@@ -130,8 +129,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             getAddress();
                             h.postDelayed(this, delay);//dalay
                         }
-                    }, delay);
-                } else
+                    }
+                }, delay);
+                if(!stop)
+                    button.setText("聽我諭令，凍結時空!");
+                else
                     button.setText("空汙終結者 出發!");
             }
         });
@@ -227,6 +229,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         } catch (IOException e) {
             e.printStackTrace();
+        }finally {
+            String s = "do nothing";
         }
         getPosition(name, true);
     }
